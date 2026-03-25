@@ -1,0 +1,17 @@
+torch>=2.2.0
+transformers>=4.46.0
+datasets>=2.20.0
+accelerate>=0.34.0
+trl>=0.11.0
+peft>=0.12.0
+bitsandbytes>=0.43.0
+safetensors>=0.4.5
+einops>=0.8.0
+sentencepiece>=0.2.0
+pyyaml>=6.0.2
+tqdm>=4.66.0
+numpy>=1.26.0
+evaluate>=0.4.3
+scikit-learn>=1.5.0
+modelscope>=1.16.0
+

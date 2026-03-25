@@ -1,0 +1,61 @@
+﻿project_name: tiny-r1-grpo-math
+seed: 42
+
+model:
+  model_name_or_path: outputs/merged/sft
+  torch_dtype: bfloat16
+  use_flash_attention_2: false
+
+data:
+  dataset_name: open-r1/OpenR1-Math-220k
+  train_split: train
+  eval_split: null
+  max_samples: 30000
+  prompt_field: problem
+  answer_field: answer
+  max_prompt_length: 1024
+  max_completion_length: 512
+
+reward:
+  use_format_reward: true
+  use_accuracy_reward: true
+  format_weight: 0.2
+  accuracy_weight: 0.8
+
+lora:
+  enabled: true
+  r: 16
+  lora_alpha: 32
+  lora_dropout: 0.05
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+training:
+  output_dir: outputs/grpo_math
+  logging_dir: outputs/grpo_math/logs
+  per_device_train_batch_size: 1
+  gradient_accumulation_steps: 16
+  learning_rate: 1.0e-6
+  lr_scheduler_type: cosine
+  warmup_ratio: 0.1
+  weight_decay: 0.0
+  num_train_epochs: 1
+  max_steps: 1000
+  logging_steps: 5
+  save_steps: 200
+  save_total_limit: 2
+  bf16: true
+  fp16: false
+  gradient_checkpointing: true
+  max_grad_norm: 1.0
+  report_to:
+    - tensorboard
+  num_generations: 4
+  temperature: 0.8
+  top_p: 0.95

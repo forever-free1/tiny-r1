@@ -1,0 +1,53 @@
+﻿project_name: tiny-r1-sft-baseline
+seed: 42
+
+model:
+  model_name_or_path: Qwen/Qwen2.5-0.5B
+  torch_dtype: bfloat16
+  use_flash_attention_2: false
+
+data:
+  dataset_name: open-r1/Mixture-of-Thoughts
+  train_split: train
+  eval_split: null
+  max_samples: 50000
+  max_length: 2048
+  text_field: text
+  streaming: false
+
+lora:
+  enabled: true
+  r: 16
+  lora_alpha: 32
+  lora_dropout: 0.05
+  target_modules:
+    - q_proj
+    - k_proj
+    - v_proj
+    - o_proj
+    - gate_proj
+    - up_proj
+    - down_proj
+
+training:
+  output_dir: outputs/sft
+  logging_dir: outputs/sft/logs
+  per_device_train_batch_size: 2
+  per_device_eval_batch_size: 2
+  gradient_accumulation_steps: 16
+  learning_rate: 2.0e-5
+  lr_scheduler_type: cosine
+  warmup_ratio: 0.03
+  weight_decay: 0.01
+  num_train_epochs: 1
+  max_steps: -1
+  logging_steps: 10
+  save_steps: 500
+  eval_steps: 500
+  save_total_limit: 2
+  bf16: true
+  fp16: false
+  gradient_checkpointing: true
+  max_grad_norm: 1.0
+  report_to:
+    - tensorboard
