@@ -60,18 +60,31 @@ def _write_jsonl(path: str, rows: List[Dict[str, Any]]) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="准备数学 RL 数据并输出 jsonl")
-    parser.add_argument("--dataset_name", type=str, default="open-r1/OpenR1-Math-220k")
-    parser.add_argument("--split", type=str, default="train", help="从 default split 抽样")
-    parser.add_argument("--output_dir", type=str, default="data/processed/math_rl")
-    parser.add_argument("--max_samples", type=int, default=120000, help="清洗去重后最大保留数量")
-    parser.add_argument("--eval_size", type=int, default=2000, help="评估集样本数")
-    parser.add_argument("--seed", type=int, default=42)
+    parser = argparse.ArgumentParser(
+        description="准备数学 RL 数据并输出 jsonl，支持 HF 数据集 config（如 default）。"
+    )
+    parser.add_argument(
+        "--dataset_name",
+        type=str,
+        default="open-r1/OpenR1-Math-220k",
+        help="Hugging Face 数据集名称。",
+    )
+    parser.add_argument(
+        "--config_name",
+        type=str,
+        default="default",
+        help="Hugging Face 数据集配置名（config name），默认 default。",
+    )
+    parser.add_argument("--split", type=str, default="train", help="从指定 split 抽样。")
+    parser.add_argument("--output_dir", type=str, default="data/processed/math_rl", help="输出目录。")
+    parser.add_argument("--max_samples", type=int, default=120000, help="清洗去重后最大保留数量。")
+    parser.add_argument("--eval_size", type=int, default=2000, help="评估集样本数。")
+    parser.add_argument("--seed", type=int, default=42, help="随机种子。")
     args = parser.parse_args()
 
     rng = random.Random(args.seed)
-    print(f"[MATH-RL] 加载数据集: {args.dataset_name} ({args.split})")
-    ds = load_dataset(args.dataset_name, split=args.split)
+    print(f"[MATH-RL] 加载数据集: {args.dataset_name} / {args.config_name} ({args.split})")
+    ds = load_dataset(args.dataset_name, args.config_name, split=args.split)
 
     err_counter = Counter()
     dedup_set = set()

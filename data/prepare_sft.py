@@ -92,21 +92,39 @@ def _write_jsonl(path: str, rows: List[Dict[str, Any]]) -> None:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="准备 SFT 数据并输出统一 jsonl")
-    parser.add_argument("--dataset_name", type=str, default="open-r1/Mixture-of-Thoughts")
-    parser.add_argument("--split", type=str, default="train")
-    parser.add_argument("--output_dir", type=str, default="data/processed/sft")
-    parser.add_argument("--max_samples", type=int, default=60000, help="最终保留的总样本上限")
-    parser.add_argument("--val_ratio", type=float, default=0.02, help="验证集比例")
-    parser.add_argument("--ratios", type=str, default="math=0.6,code=0.25,science=0.15")
-    parser.add_argument("--seed", type=int, default=42)
+    parser = argparse.ArgumentParser(
+        description="准备 SFT 数据并输出统一 jsonl，支持 HF 数据集 config（如 all/default 等）。"
+    )
+    parser.add_argument(
+        "--dataset_name",
+        type=str,
+        default="open-r1/Mixture-of-Thoughts",
+        help="Hugging Face 数据集名称。",
+    )
+    parser.add_argument(
+        "--config_name",
+        type=str,
+        default="all",
+        help="Hugging Face 数据集配置名（config name），默认 all。",
+    )
+    parser.add_argument("--split", type=str, default="train", help="要读取的数据切分。")
+    parser.add_argument("--output_dir", type=str, default="data/processed/sft", help="输出目录。")
+    parser.add_argument("--max_samples", type=int, default=60000, help="最终保留的总样本上限。")
+    parser.add_argument("--val_ratio", type=float, default=0.02, help="验证集比例（0~1）。")
+    parser.add_argument(
+        "--ratios",
+        type=str,
+        default="math=0.6,code=0.25,science=0.15",
+        help="任务采样配比，格式如 math=0.6,code=0.25,science=0.15。",
+    )
+    parser.add_argument("--seed", type=int, default=42, help="随机种子。")
     args = parser.parse_args()
 
     rng = random.Random(args.seed)
     ratios = _parse_ratios(args.ratios)
 
-    print(f"[SFT] 加载数据集: {args.dataset_name} ({args.split})")
-    ds = load_dataset(args.dataset_name, split=args.split)
+    print(f"[SFT] 加载数据集: {args.dataset_name} / {args.config_name} ({args.split})")
+    ds = load_dataset(args.dataset_name, args.config_name, split=args.split)
     total_raw = len(ds)
 
     buckets: Dict[str, List[Dict[str, Any]]] = defaultdict(list)
